@@ -15,15 +15,97 @@ else
 	require("shell").execute("wget -q https://pastebin.com/raw/akWrDjEa /lib/durexdb.lua") end
 end
 
+local player = "Durex77"
+local login = false
+local time_sleep = 0.15
+local value = 1
+local game = false
+local card_holds = {false,false,false,false,false}
+
+function drawGame()
+  gpu.setBackground(0x7fa77d)
+  term.clear()
+  gpu.setBackground(0x3d3d3d)
+  gpu.fill(4,2,24,1,' ')
+  gpu.fill(24,5,4,10,' ')
+  gpu.fill(30,10,8,1,' ')
+  gpu.fill(4,5,20,1,' ')
+  gpu.setForeground(0x00ff00)
+  gpu.set(4,5,'Комбинации:')
+  gpu.set(4,2,'Текущий игрок:')  
+  gpu.set(30,10,'Ставка:')  
+  gpu.setBackground(0x000000)
+  gpu.fill(4,3,24,1,' ')
+  gpu.fill(4,6,20,9,' ')
+  gpu.fill(30,11,8,5,' ')
+  gpu.setForeground(0xffffff)
+  gpu.set(4,3, player)
+  gpu.set(4,6,'Флеш Рояль')
+  gpu.set(4,7,'Стрит Флеш')
+  gpu.set(4,8,'Каре')
+  gpu.set(4,9,'Фулл хаус')
+  gpu.set(4,10,'Флеш')
+  gpu.set(4,11,'Стрит')
+  gpu.set(4,12,'Трипс')
+  gpu.set(4,13,'Две пары')
+  gpu.set(4,14,'Пара вальтов и выше')
+  for i = 1,5 do gpu.set(33,10+i,tostring(i)) end  
+  gpu.setBackground(0x00ff00)
+  gpu.fill(30,16,8,4,' ')
+  gpu.set(31,18,'Начать')
+  
+  --Рисую картинку
+  gpu.setBackground(0xffffff) gpu.fill(34,2,1,1,' ') gpu.fill(33,3,3,1,' ') gpu.fill(32,4,5,1,' ') gpu.fill(31,5,7,1,' ') gpu.fill(34,6,1,1,' ') gpu.fill(33,7,3,1,' ')
+  gpu.setBackground(0xc6c6c6) gpu.set(33,2,' ') gpu.set(32,3,' ') gpu.set(31,4,' ') gpu.set(30,5,' ') gpu.set(33,6,' ') gpu.set(32,7,' ')
+end
+  
+function getDevideBy4(number) return string.rep(' ',4-string.len(number))..number end
+
+function drawRewards(k,comb)
+  gpu.setForeground(0x0000ff)
+  gpu.setBackground(0x3d3d3d)
+  if (k==5) then
+  	gpu.set(24,6,getDevideBy4(4000))
+	else
+  gpu.set(24,6,getDevideBy4(250*k))
+  end
+  gpu.set(24,7,getDevideBy4(50*k))
+  gpu.set(24,8,getDevideBy4(25*k))
+  gpu.set(24,9,getDevideBy4(9*k))
+  gpu.set(24,10,getDevideBy4(5*k))
+  gpu.set(24,11,getDevideBy4(4*k))
+  gpu.set(24,12,getDevideBy4(3*k))
+  gpu.set(24,13,getDevideBy4(2*k))
+  gpu.set(24,14,getDevideBy4(1*k))
+
+if (comb >0) then
+	  gpu.setBackground(0x00ff00)
+	if (k==5 and comb == 1) then
+  		gpu.set(24,6,getDevideBy4(4000))
+	else
+  		gpu.set(24,comb+5,getDevideBy4(moneyOfCombination(comb)))
+ 	 end
+end
+  gpu.setBackground(0x000000)
+  for i = 1,5 do 
+  	if (i==k) then
+	  gpu.setForeground(0x00ff00)
+	  gpu.set(33,10+i,tostring(i)) 
+	else
+	gpu.setForeground(0xffffff)
+	  gpu.set(33,10+i,tostring(i)) 
+	end
+  end  
+end
+
+gpu.setResolution(40,20)
+
 chat.setDistance(6)
 chat.setName("§6Video_Poker§l")
 
 --event.shouldInterrupt = function () return false end
 
 local durexdb = require("durexdb")
-
-local login,blackjack,player,value,players_cards,time_sleep,time_sleep_end = false,false,'PIDOR',1,{},0.2,1.5
---io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
 
 function localsay(msg) chat.say("§e".. msg) end
 
@@ -91,8 +173,22 @@ end
 
 function getMaxCard(cards)
 	local index = 1
-	for i=2,#cards do if (card_power(cards[i]>card_power(cards[index].card))) then index = i end end
+	for i=2,#cards do if (card_power(cards[i].card)>card_power(cards[index].card)) then index = i end end
 	return cards[index].card
+end
+
+function moneyOfCombination(combination)
+	if (value==5 and combination==1) then return 4000 
+	elseif (combination==1) then return 250*value 
+	elseif (combination==2) then return 50*value 
+	elseif (combination==3) then return 25*value 
+	elseif (combination==4) then return 9*value 
+	elseif (combination==5) then return 5*value 
+	elseif (combination==6) then return 4*value 
+	elseif (combination==7) then return 3*value 
+	elseif (combination==8) then return 2*value 
+	elseif (combination==9) then return 1*value 
+	else return 0 end
 end
 
 function isStraight(cards)
@@ -107,7 +203,7 @@ function isStraightFlush(cards)
 end
 
 function isFlushRoyal(cards)
-	return (isStraightFlush and isCardWithPower(cards,14) and isCardWithPower(cards,13))
+	return (isStraightFlush(cards) and isCardWithPower(cards,14) and isCardWithPower(cards,13))
 end
 
 function countOfCard(cards,card)
@@ -116,31 +212,31 @@ function countOfCard(cards,card)
 end
 
 function isFourOfAKind(cards)
-	for i=1,2 do if (countOfCard(cards,cards[i].card) == 4) return true end end
+	for i=1,2 do if (countOfCard(cards,cards[i].card) == 4) then return true end end
 	return false
 end
 
 function isFullHous(cards)
 	local trips,pair = false,false
 	for i=1,4 do
-		if (countOfCard(cards,cards[i].card) == 3) trips = true
-		elseif (countOfCard(cards,cards[i].card) == 2) pair = true end end
+		if (countOfCard(cards,cards[i].card) == 3) then trips = true
+		elseif (countOfCard(cards,cards[i].card) == 2) then pair = true end end
 	return (trips and pair)
 end
 
 function isTrips(cards)
-	for i=1,3 do if (countOfCard(cards,cards[i].card) == 3)	return true	end	end
+	for i=1,3 do if (countOfCard(cards,cards[i].card) == 3) then return true	end	end
 	return false
 end
 
 function isTwoPairs(cards)
 	local count_of_pairs = 0
-	for i=1,5 do if (countOfCard(cards,cards[i].card) == 2) count_of_pairs = count_of_pairs + 1 end end
+	for i=1,5 do if (countOfCard(cards,cards[i].card) == 2) then count_of_pairs = count_of_pairs + 1 end end
 	return (count_of_pairs == 4)
 end
 
 function isJackOrBetter(cards)
-	for i=1,4 do if (countOfCard(cards,cards[i].card) == 2 and cards[i].card) return true end end
+	for i=1,4 do if (countOfCard(cards,cards[i].card) == 2 and card_power(cards[i].card)>=11) then return true end end
 	return false
 end
 
@@ -151,75 +247,66 @@ function get_combination(cards)
 	elseif(isFullHous(cards)) then return 4
 	elseif(isFlush(cards)) then return 5
 	elseif(isStraight(cards)) then return 6
-	elseif(isTrips(cards) then return 7
-	elseif(isTwoPairs(cards) then return 8
+	elseif(isTrips(cards)) then return 7
+	elseif(isTwoPairs(cards)) then return 8
 	elseif(isJackOrBetter(cards)) then return 9
 	else return 0 end
 end
 
-function drawDisplayForOneHand()
-	gpu.setBackground(0x00221f)
-	term.clear()
-	gpu.setBackground(0x0000CD)
-	gpu.setForeground(0xffffff)
-	gpu.fill(3,2,36,18," ")
-  
-	gpu.setBackground(0x00221f)
-	for i = 0,4 do gpu.fill(9+i*5,13,4,4,' ') end
-	
-	gpu.setBackground(0x0000CD)
-	gpu.setForeground(0xffffff)
-    gpu.set(10,3,'Флеш Рояль')
-    gpu.set(10,4,'Стрит Флеш')
-    gpu.set(10,5,'Каре')
-    gpu.set(10,6,'Фул хаус')
-    gpu.set(10,7,'Флеш')
-    gpu.set(10,8,'Стрит')
-    gpu.set(10,9,'Трипс')
-    gpu.set(10,10,'Две пары')
-    gpu.set(10,11,'Валеты и выше')
-	
-	gpu.setBackground(0x800000)
-	local temp_x = 25
-	gpu.set(temp_x,3,'    250')
-    gpu.set(temp_x,4,'     50')
-    gpu.set(temp_x,5,'     25')
-    gpu.set(temp_x,6,'      9')
-    gpu.set(temp_x,7,'      5')
-    gpu.set(temp_x,8,'      4')
-    gpu.set(temp_x,9,'      3')
-    gpu.set(temp_x,10,'      2')
-    gpu.set(temp_x,11,'      1')
-	
-	
-	--ставка можна ставить ток 1 2 3 4 5
-	
-
-	
-	gpu.setBackground(0x010101)
-	gpu.set(3,18,'В меню')
-	gpu.set(16,18,'Роздать')
-	
-	gpu.set(25,18,'1')
-	gpu.set(27,18,'2')
-	gpu.set(29,18,'3')
-	gpu.set(31,18,'4')
-	gpu.set(32,18,'5')
-
+function logining()
+	drawGame()
+	game = false
+	drawRewards(1,0)
 end
 
 function startGame()
-	blackjack = false
+	drawRewards(value,0)
+	gpu.setBackground(0x7fa77d)
+	gpu.setForeground(0xffffff)
+	gpu.fill(4,15,25,5,' ')
+	card_holds = {false,false,false,false,false}
+	gpu.setBackground(0x00ff00)
+  gpu.fill(30,16,8,4,' ')
+  gpu.set(30,18,'Поменять')
+	game = true
 	players_cards = {}
 	deck:hinder()
-	
-	drawDisplayForOneHand()
 	give_card_player(0)
 	give_card_player(1)
 	give_card_player(2)
 	give_card_player(3)
 	give_card_player(4)
+	drawRewards(value,get_combination(players_cards))
+	rewardPlayer(player,moneyOfCombination(get_combination(players_cards)),"Поздравляю")
+end
 
+function drawCard(x,card)
+	x= x*5 +4
+	gpu.fill(x,16,4,4,' ')
+	os.sleep(time_sleep)
+	gpu.set(x,16,card.card)
+	gpu.set(x+1,17,card.suit)
+	gpu.set(x+2,18,card.suit)
+	if card.card == '10' then
+		gpu.set(x+2,19,card.card)
+	else
+		gpu.set(x+3,19,card.card)
+	end
+	os.sleep(time_sleep)
+end
+
+function drawHeld(x)
+	gpu.setBackground(0x7fa77d)
+	gpu.setForeground(0xffffff)
+	if card_holds[x+1] then
+		card_holds[x+1] = false
+		x= x*5 +4
+		gpu.fill(x,15,4,1,' ')
+	else
+		card_holds[x+1] = true
+		x= x*5 +4
+		gpu.set(x,15,'Held')
+	end
 end
 
 function give_card_player(id_card)
@@ -230,95 +317,39 @@ function give_card_player(id_card)
 	else
 		gpu.setForeground(0x000000)
 	end
-	if id_card == 0 then
-		gpu.fill(9,13,4,4,' ')
-		os.sleep(time_sleep)
-		gpu.set(9,13,card.card)
-		gpu.set(10,14,card.suit)
-		gpu.set(11,15,card.suit)
-		if card.card == '10' then
-			gpu.set(11,16,card.card)
-		else
-			gpu.set(12,16,card.card)
-		end
-		os.sleep(time_sleep)
-	elseif id_card == 1 then
-		gpu.fill(14,13,4,4,' ')
-		os.sleep(time_sleep)
-		gpu.set(14,13,card.card)
-		gpu.set(15,14,card.suit)
-		gpu.set(16,15,card.suit)
-		if card.card == '10' then
-			gpu.set(16,16,card.card)
-		else
-			gpu.set(17,16,card.card)
-		end
-	elseif id_card == 2 then
-		gpu.fill(19,13,4,4,' ')
-		os.sleep(time_sleep)
-		gpu.set(19,13,card.card)
-		gpu.set(20,14,card.suit)
-		gpu.set(21,15,card.suit)
-		if card.card == '10' then
-			gpu.set(21,16,card.card)
-		else
-			gpu.set(22,16,card.card)
-		end
-	elseif id_card == 3 then
-		gpu.fill(24,13,4,4,' ')
-		os.sleep(time_sleep)
-		gpu.set(24,13,card.card)
-		gpu.set(25,14,card.suit)
-		gpu.set(26,15,card.suit)
-		if card.card == '10' then
-			gpu.set(26,16,card.card)
-		else
-			gpu.set(27,16,card.card)
-		end
-	elseif id_card == 4 then
-		gpu.fill(29,13,4,4,' ')
-		os.sleep(time_sleep)
-		gpu.set(29,13,card.card)
-		gpu.set(30,14,card.suit)
-		gpu.set(31,15,card.suit)
-		if card.card == '10' then
-			gpu.set(31,16,card.card)
-		else
-			gpu.set(32,16,card.card)
-		end
-	end
-	players_cards[id_card] = card
+	drawCard(id_card,card)
+	players_cards[id_card+1] = card
 	os.sleep(time_sleep)
 end
 
 	
 function drawDisplay()
-	gpu.setBackground(0xe0e0e0)
-	term.clear()
-	gpu.setBackground(0x00aa00)
-	gpu.fill(3,2,14,7,' ')
-	gpu.setBackground(0xffffff)
-	gpu.setForeground(0xaa0000)
+		gpu.setBackground(0xe0e0e0)
+		term.clear()
+		gpu.setBackground(0x00aa00)
+		gpu.fill(3,2,14,7,' ')
+		gpu.setBackground(0xffffff)
+		gpu.setForeground(0xaa0000)
 	
-	gpu.fill(5,3,4,4,' ')
-	gpu.set(5,3,'J')
-	gpu.set(6,4,'♥')
-	gpu.set(7,5,'♥')
-	gpu.set(8,6,'J')
+		gpu.fill(5,3,4,4,' ')
+		gpu.set(5,3,'J')
+		gpu.set(6,4,'♥')
+		gpu.set(7,5,'♥')
+		gpu.set(8,6,'J')
 	
-	gpu.setForeground(0x000000)
-	gpu.fill(11,4,4,4,' ')
-	gpu.set(11,4,'T')
-	gpu.set(12,5,'♠')
-	gpu.set(13,6,'♠')
-	gpu.set(14,7,'T')
+		gpu.setForeground(0x000000)
+		gpu.fill(11,4,4,4,' ')
+		gpu.set(11,4,'T')
+		gpu.set(12,5,'♠')
+		gpu.set(13,6,'♠')
+		gpu.set(14,7,'T')
 	
-	gpu.fill(3,10,36,10,' ')
-	gpu.fill(19,2,20,7,' ')
-	gpu.setForeground(0xffffff)						
-	gpu.setBackground(0x00aa00)
-	gpu.fill(32,5,6,3,' ')
-	gpu.set(20,5,'1')
+		gpu.fill(3,10,36,10,' ')
+		gpu.fill(19,2,20,7,' ')
+		gpu.setForeground(0xffffff)						
+		gpu.setBackground(0x00aa00)
+		gpu.fill(32,5,6,3,' ')
+		gpu.set(20,5,'1')
 		value = 1
 		gpu.set(32,6,'Начать')
 		gpu.setForeground(0x000000)
@@ -334,10 +365,23 @@ function drawDisplay()
 	  --Connector:give(player,reward)
 	  os.sleep(time_sleep_end)
 	  login = false
-	  blackjack = false
 	  drawDisplay()
 	end
 	
+	function updateCards()
+		for i=1,5 do
+			if (card_holds[i] == false) then
+				give_card_player(i-1)
+			end
+		end
+		game = false
+		gpu.setBackground(0x00ff00)
+		gpu.setForeground(0xffffff)
+  		gpu.set(30,18,' Начать ')
+		drawRewards(value,get_combination(players_cards))
+		rewardPlayer(player,moneyOfCombination(get_combination(players_cards)),"Поздравляю")
+	end
+
 	drawDisplay()
 	endtime = 0
 	while true do
@@ -350,42 +394,49 @@ function drawDisplay()
 				goto continue
 		end
 		if (login) and p == player then
-			if blackjack then
-				if (x>=9 and y==11 and x<=19) then rewardPlayer(player,value,"Black Jack!")
-				elseif (x>=22 and y==11 and x<33) then
-
-				end
-			elseif x>=9 and y==11 and x<20 then
-				give_card_player()
-			elseif x>=22 and y==11 and x<33 then
-
-			elseif x>=9 and y==13 and x<20 then
-				if (#players_cards > 2) then
-					localsay(p..", удвоить можна только с двумя картами на руках.")
-				--elseif (Connector:pay(p,value)) then
-					gpu.setBackground(0x00aa00)
-					value=value*2
-					gpu.setForeground(0xffffff)
-					gpu.set(13,4,"Ставка: "..value)
-					give_card_player()
-					if (login) then
-
+			endtime = os.time()+1640
+			if (game == false) then
+				if (x>=30 and y>= 16 and x<=37 and y<=19) then
+					startGame()
+				elseif (x>=30 and y>=11 and x<=37 and y<=15) then
+					if(y == 11) then
+						drawRewards(1,0)
+						value = 1
+					elseif(y == 12) then
+						drawRewards(2,0)
+						value = 2
+					elseif(y == 13) then
+						drawRewards(3,0)
+						value=3
+					elseif(y == 14) then
+						drawRewards(4,0)
+						value=4
+					elseif(y == 15) then
+						drawRewards(5,0)
+						value=5
 					end
-				else
-					localsay(p..", у вас нет столько денег. Пополните счёт в ближайшем терминале.")
+				end
+			else
+				if (x>=30 and y>= 16 and x<=37 and y<=19) then
+					updateCards()
+				elseif (x>=4 and x<=7 and y>=16 and y<=19) then
+					drawHeld(0)
+				elseif (x>=9 and x<=12 and y>=16 and y<=19) then
+					drawHeld(1)
+				elseif (x>=14 and x<=17 and y>=16 and y<=19) then
+					drawHeld(2)
+				elseif (x>=19 and x<=22 and y>=16 and y<=19) then
+					drawHeld(3)
+				elseif (x>=24 and x<=27 and y>=16 and y<=19) then
+					drawHeld(4)
 				end
 			end
 		elseif login == false and e == 'touch' then    
 			if (x >=32 and x<=37 and y >=5 and y<=7) then
-				--if (Connector:pay(p,value)) then
-				if (true) then
-					player = p
-					login = true
-					endtime = os.time()+1640
-					startGame()
-				else
-					localsay(p..", у вас нет столько денег. Пополните счёт в ближайшем терминале.")
-				end
+				player = p
+				login = true
+				endtime = os.time()+1640
+				logining()
 			end
 		end
 	end
