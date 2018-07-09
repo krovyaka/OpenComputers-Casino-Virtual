@@ -15,35 +15,66 @@ if not require("filesystem").exists("/lib/durexdb.lua") then
 end
 
 require("durexdb")
-io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
+--io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
+Connector = DurexDatabase:new("40b074cdd9ce49e5b60651ada335ef41")
 gpu.setForeground(0xffffff)
 
-event.shouldInterrupt = function () return false end
+--event.shouldInterrupt = function () return false end
 
-function drawInterface(nick)
+local player = "Durex77"
+
+function drawCheck(nick)
   money_of_player = Connector:get(nick)
-  gpu.setResolution(32,16)
-  gpu.setBackground(0xa0a0a0)
-  term.clear()
   gpu.setBackground(0x000000)
   gpu.fill(3,2,28,14," ")
-  gpu.set(16-math.floor(unicode.len(nick)/2),6,nick)
-  gpu.set(6,7,"   На вашем счету ")
+  gpu.set(17-math.floor(unicode.len(nick)/2),6,nick)
+  gpu.set(7,7,"   На вашем счету ")
   gpu.set(16-math.floor(unicode.len(money_of_player..'')/2),8,money_of_player..'')
   gpu.set(6,9,"      дюрексиков ")
-  
-
   gpu.setBackground(0xaa0000)
   gpu.fill(3,13,28,3," ")
-  gpu.set(13,14,"Click me")
-  login = true
-  player = nick
+  gpu.set(9,14,"Проверить баланс")
+  gpu.setBackground(0x888888)
+  gpu.set(25,2,"Лакеры")
+  gpu.set(3,2,"Анлакеры")
 end
 
-drawInterface("Durex77")
+function drawTop()
+  local tbl = Connector:top()
+  gpu.setBackground(0x000000)
+  gpu.fill(3,2,28,14," ")
+  gpu.set(4,3,"Топ лакерков в казино:")
+  for i = 1,10 do
+    gpu.set(4,3+i,i .. ". " .. tbl[i][1] .. " " .. math.floor(tbl[i][2]) .. " дюр")
+  end
+  os.sleep(4)
+  drawCheck(player)
+end
 
-while true do 
-  local _,_,_,_,_,p =event.pull("touch")
-  drawInterface(p)
+function drawBottom()
+  local tbl = Connector:top()
+  gpu.setBackground(0x000000)
+  gpu.fill(3,2,28,14," ")
+  gpu.set(4,3,"Топ анлакеров в казино:")
+  for i = 1,10 do
+    gpu.set(4,3+i,i .. ". " .. tbl[#tbl-i+1][1] .. " " .. math.floor(tbl[#tbl-i+1][2]) .. " дюр")
+  end
+  os.sleep(10)
+  drawCheck(player)
+end
+
+gpu.setResolution(32,16)
+gpu.setBackground(0xa0a0a0)
+term.clear()
+drawCheck(player)
+while true do
+  local _,_,left,top,_,p =event.pull("touch")
+  local p = "krovyak" -- DEL
+  
+  if(top>12) then player = p drawCheck(p) end
+  if(top==2) then
+    if(left<11) then drawBottom()
+    elseif(left>24) then drawTop() end
+  end
 end
 
