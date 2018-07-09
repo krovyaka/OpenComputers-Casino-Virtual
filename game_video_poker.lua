@@ -58,6 +58,105 @@ local deck = Deck:new()
 
 gpu.setResolution(40,20)
 
+function isFlush(cards)
+	for i=2,#cards do if (cards[i].suit ~= cards[1].suit) then return false end end
+	return true
+end
+
+function isExist(cards,card,suit)
+	for i=1,#cards do if (cards[i].card == card and cards[i].suit == suit) then return true end end
+	return false
+end
+
+function card_power(card)
+	if card == '2' then return 2
+	elseif card == '3' then return 3
+	elseif card == '4' then return 4
+	elseif card == '5' then	return 5
+	elseif card == '6' then	return 6
+	elseif card == '7' then	return 7
+	elseif card == '8' then	return 8
+	elseif card == '9' then	return 9
+	elseif card == '10' then return 10
+	elseif card == 'J' then	return 11
+	elseif card == 'Q' then	return 12
+	elseif card == 'K' then	return 13
+	elseif card == 'T' then	return 14 end
+end
+
+function isCardWithPower(cards,power)
+	for i=1,#cards do if (card_power(cards[i].card) == power) then return true end end
+	return false
+end
+
+function getMaxCard(cards)
+	local index = 1
+	for i=2,#cards do if (card_power(cards[i]>card_power(cards[index].card))) then index = i end end
+	return cards[index].card
+end
+
+function isStraight(cards)
+	local temp_card = getMaxCard(cards)
+	if (isCardWithPower(cards,2) and isCardWithPower(cards,3) and isCardWithPower(cards,4) and isCardWithPower(cards,5) and isCardWithPower(cards,14)) then return true end
+	for i=1,4 do if (isCardWithPower(cards,card_power(temp_card)-i)==false) then return false end end
+	return true
+end
+
+function isStraightFlush(cards)
+	return (isStraight(cards) and isFlush(cards))
+end
+
+function isFlushRoyal(cards)
+	return (isStraightFlush and isCardWithPower(cards,14) and isCardWithPower(cards,13))
+end
+
+function countOfCard(cards,card)
+	local count = 0
+	for i=1,#cards do if (cards[i].card == card) then count = count + 1 end end	return count
+end
+
+function isFourOfAKind(cards)
+	for i=1,2 do if (countOfCard(cards,cards[i].card) == 4) return true end end
+	return false
+end
+
+function isFullHous(cards)
+	local trips,pair = false,false
+	for i=1,4 do
+		if (countOfCard(cards,cards[i].card) == 3) trips = true
+		elseif (countOfCard(cards,cards[i].card) == 2) pair = true end end
+	return (trips and pair)
+end
+
+function isTrips(cards)
+	for i=1,3 do if (countOfCard(cards,cards[i].card) == 3)	return true	end	end
+	return false
+end
+
+function isTwoPairs(cards)
+	local count_of_pairs = 0
+	for i=1,5 do if (countOfCard(cards,cards[i].card) == 2) count_of_pairs = count_of_pairs + 1 end end
+	return (count_of_pairs == 4)
+end
+
+function isJackOrBetter(cards)
+	for i=1,4 do if (countOfCard(cards,cards[i].card) == 2 and cards[i].card) return true end end
+	return false
+end
+
+function get_combination(cards)
+	if (isFlushRoyal) then return 1
+	elseif(isStraightFlush) then return 2
+	elseif(isFourOfAKind) then return 3
+	elseif(isFullHous) then return 4
+	elseif(isFlush) then return 5
+	elseif(isStraight) then return 6
+	elseif(isTrips()) then return 7
+	elseif(isTwoPairs()) then return 8
+	elseif(isJackOrBetter()) then return 9
+	else return 0 end
+end
+
 function drawDisplayForOneHand()
 	gpu.setBackground(0x00221f)
 	term.clear()
