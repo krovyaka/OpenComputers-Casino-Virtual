@@ -145,15 +145,15 @@ function isJackOrBetter(cards)
 end
 
 function get_combination(cards)
-	if (isFlushRoyal) then return 1
-	elseif(isStraightFlush) then return 2
-	elseif(isFourOfAKind) then return 3
-	elseif(isFullHous) then return 4
-	elseif(isFlush) then return 5
-	elseif(isStraight) then return 6
-	elseif(isTrips()) then return 7
-	elseif(isTwoPairs()) then return 8
-	elseif(isJackOrBetter()) then return 9
+	if (isFlushRoyal(cards)) then return 1
+	elseif(isStraightFlush(cards)) then return 2
+	elseif(isFourOfAKind(cards)) then return 3
+	elseif(isFullHous(cards)) then return 4
+	elseif(isFlush(cards)) then return 5
+	elseif(isStraight(cards)) then return 6
+	elseif(isTrips(cards) then return 7
+	elseif(isTwoPairs(cards) then return 8
+	elseif(isJackOrBetter(cards)) then return 9
 	else return 0 end
 end
 
