@@ -69,7 +69,7 @@ term.clear()
 drawCheck(player)
 while true do
   local _,_,left,top,_,p =event.pull("touch")
-  local p = "krovyak" -- DEL
+
   
   if(top>12) then player = p drawCheck(p) end
   if(top==2) then
