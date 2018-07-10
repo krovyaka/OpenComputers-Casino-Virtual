@@ -23,7 +23,7 @@ event.shouldInterrupt = function () return false end
 local durexdb = require("durexdb")
 
 local login,blackjack,player,value,players_cards,diller_cards,time_sleep,time_sleep_end = false,false,'PIDOR',1,{},{},0.2,1.5
-io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
+io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) gpu.setBackground(0x000000) Connector = DurexDatabase:new(io.read())
 
 function localsay(msg) chat.say("§e".. msg) end
 

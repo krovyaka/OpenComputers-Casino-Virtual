@@ -21,6 +21,8 @@ local time_sleep = 0.15
 local value = 1
 local game = false
 local card_holds = {false,false,false,false,false}
+local durexdb = require("durexdb")
+io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) gpu.setBackground(0x000000) Connector = DurexDatabase:new(io.read())
 
 function drawGame()
   gpu.setBackground(0x7fa77d)
@@ -28,18 +30,18 @@ function drawGame()
   gpu.setBackground(0x3d3d3d)
   gpu.fill(4,2,24,1,' ')
   gpu.fill(24,5,4,10,' ')
-  gpu.fill(30,10,8,1,' ')
+  gpu.fill(30,11,8,1,' ')
   gpu.fill(4,5,20,1,' ')
   gpu.setForeground(0x00ff00)
   gpu.set(4,5,'Комбинации:')
   gpu.set(4,2,'Текущий игрок:')  
-  gpu.set(30,10,'Ставка:')  
+  gpu.set(30,11,'Ставка:')  
   gpu.setBackground(0x000000)
   gpu.fill(4,3,24,1,' ')
   gpu.fill(4,6,20,9,' ')
-  gpu.fill(30,11,8,5,' ')
+  gpu.fill(30,12,8,5,' ')
   gpu.setForeground(0xffffff)
-  gpu.set(4,3, player)
+  gpu.set(4,3, player..'('..Connector:get(player) ..'дюр.)')
   gpu.set(4,6,'Флеш Рояль')
   gpu.set(4,7,'Стрит Флеш')
   gpu.set(4,8,'Каре')
@@ -49,14 +51,17 @@ function drawGame()
   gpu.set(4,12,'Трипс')
   gpu.set(4,13,'Две пары')
   gpu.set(4,14,'Пара вальтов и выше')
-  for i = 1,5 do gpu.set(33,10+i,tostring(i)) end  
+  for i = 1,5 do gpu.set(33,11+i,tostring(i)) end  
+  gpu.setBackground(0xff0000)
+  gpu.fill(30,2,8,3,' ')
+  gpu.set(31,3,'В меню')
   gpu.setBackground(0x00ff00)
-  gpu.fill(30,16,8,4,' ')
+  gpu.fill(30,17,8,3,' ')
   gpu.set(31,18,'Начать')
   
   --Рисую картинку
-  gpu.setBackground(0xffffff) gpu.fill(34,2,1,1,' ') gpu.fill(33,3,3,1,' ') gpu.fill(32,4,5,1,' ') gpu.fill(31,5,7,1,' ') gpu.fill(34,6,1,1,' ') gpu.fill(33,7,3,1,' ')
-  gpu.setBackground(0xc6c6c6) gpu.set(33,2,' ') gpu.set(32,3,' ') gpu.set(31,4,' ') gpu.set(30,5,' ') gpu.set(33,6,' ') gpu.set(32,7,' ')
+  gpu.setBackground(0xffffff) gpu.fill(34,5,1,1,' ') gpu.fill(33,6,3,1,' ') gpu.fill(32,7,5,1,' ') gpu.fill(31,8,7,1,' ') gpu.fill(34,9,1,1,' ') gpu.fill(33,10,3,1,' ')
+  gpu.setBackground(0xc6c6c6) gpu.set(33,5,' ') gpu.set(32,6,' ') gpu.set(31,7,' ') gpu.set(30,8,' ') gpu.set(33,9,' ') gpu.set(32,10,' ')
 end
   
 function getDevideBy4(number) return string.rep(' ',4-string.len(number))..number end
@@ -90,10 +95,10 @@ end
   for i = 1,5 do 
   	if (i==k) then
 	  gpu.setForeground(0x00ff00)
-	  gpu.set(33,10+i,tostring(i)) 
+	  gpu.set(33,11+i,tostring(i)) 
 	else
 	gpu.setForeground(0xffffff)
-	  gpu.set(33,10+i,tostring(i)) 
+	  gpu.set(33,11+i,tostring(i)) 
 	end
   end  
 end
@@ -103,9 +108,7 @@ gpu.setResolution(40,20)
 chat.setDistance(6)
 chat.setName("§6Video_Poker§l")
 
---event.shouldInterrupt = function () return false end
-
-local durexdb = require("durexdb")
+event.shouldInterrupt = function () return false end
 
 function localsay(msg) chat.say("§e".. msg) end
 
@@ -266,8 +269,7 @@ function startGame()
 	gpu.fill(4,15,25,5,' ')
 	card_holds = {false,false,false,false,false}
 	gpu.setBackground(0x00ff00)
-  gpu.fill(30,16,8,4,' ')
-  gpu.set(30,18,'Поменять')
+  	gpu.set(30,18,'Поменять')
 	game = true
 	players_cards = {}
 	deck:hinder()
@@ -277,7 +279,6 @@ function startGame()
 	give_card_player(3)
 	give_card_player(4)
 	drawRewards(value,get_combination(players_cards))
-	rewardPlayer(player,moneyOfCombination(get_combination(players_cards)),"Поздравляю")
 end
 
 function drawCard(x,card)
@@ -326,46 +327,45 @@ end
 function drawDisplay()
 		gpu.setBackground(0xe0e0e0)
 		term.clear()
-		gpu.setBackground(0x00aa00)
-		gpu.fill(3,2,14,7,' ')
-		gpu.setBackground(0xffffff)
-		gpu.setForeground(0xaa0000)
-	
-		gpu.fill(5,3,4,4,' ')
-		gpu.set(5,3,'J')
-		gpu.set(6,4,'♥')
-		gpu.set(7,5,'♥')
-		gpu.set(8,6,'J')
-	
-		gpu.setForeground(0x000000)
-		gpu.fill(11,4,4,4,' ')
-		gpu.set(11,4,'T')
-		gpu.set(12,5,'♠')
-		gpu.set(13,6,'♠')
-		gpu.set(14,7,'T')
-	
-		gpu.fill(3,10,36,10,' ')
-		gpu.fill(19,2,20,7,' ')
-		gpu.setForeground(0xffffff)						
-		gpu.setBackground(0x00aa00)
-		gpu.fill(32,5,6,3,' ')
-		gpu.set(20,5,'1')
-		value = 1
-		gpu.set(32,6,'Начать')
-		gpu.setForeground(0x000000)
-		gpu.setBackground(0xffffff)
+		gpu.setBackground(0x000000)
+		gpu.fill(3,2,17,8,' ')
 
-		gpu.set(21,3,'Выберите ставку')
+		local x=8
+		local y=4
+  		gpu.setBackground(0xffffff) gpu.fill(x,y-1,2,1,' ') gpu.fill(x-1,y,4,1,' ') gpu.fill(x-2,y+1,6,1,' ') gpu.fill(x-3,y+2,8,1,' ') gpu.fill(x,y+3,2,1,' ') gpu.fill(x-1,y+4,4,1,' ')
+  		gpu.setBackground(0xc6c6c6) gpu.set(x-1,y-1,' ') gpu.set(x-2,y,' ') gpu.set(x-3,y+1,' ') gpu.set(x-4,y+2,' ') gpu.set(x-1,y+3,' ') gpu.set(x-2,y+4,' ')
+
+
+		gpu.fill(22,2,17,8,' ')
+		gpu.fill(3,11,36,9,' ')
+		gpu.setForeground(0x000000)	
+		gpu.set(27,6,'Войти')
+		gpu.setForeground(0xffffff)						
+		gpu.setBackground(0x000000)
+		gpu.set(12,3,"Video")
+		gpu.set(13,4,"Poker")
+		
+		value = 1
+		
 
 	end
 	
 	function rewardPlayer(player,reward,msg)
-	  localsay(msg)
-	  localsay("Вы выиграли "..reward)
-	  --Connector:give(player,reward)
-	  os.sleep(time_sleep_end)
-	  login = false
-	  drawDisplay()
+		if (reward>0) then
+			localsay("Вы выиграли "..reward)
+			Connector:give(player,reward)
+			gpu.setBackground(0x000000)
+  			gpu.setForeground(0xffffff)
+  			gpu.set(4,3, player..'('..Connector:get(player) ..'дюр.)')
+		else
+			localsay("Вы проиграли ")
+		end
+	end
+	
+	function exit()
+		login = false
+		game = false
+		drawDisplay()
 	end
 	
 	function updateCards()
@@ -388,36 +388,39 @@ function drawDisplay()
 		::continue::
 		local e,_,x,y,_,p = event.pull(3,"touch") 
 		if (login) and os.time() > endtime then
-				login = false
-				blackjack = false
-				drawDisplay()
+				exit()
 				goto continue
 		end
 		if (login) and p == player then
 			endtime = os.time()+1640
 			if (game == false) then
-				if (x>=30 and y>= 16 and x<=37 and y<=19) then
+				if (x>=30 and y>= 17 and x<=37 and y<=19 and Connector:pay(player,value)) then
+					gpu.setBackground(0x000000)
+  					gpu.setForeground(0xffffff)
+  					gpu.set(4,3, player..'('..Connector:get(player) ..'дюр.)')
 					startGame()
-				elseif (x>=30 and y>=11 and x<=37 and y<=15) then
-					if(y == 11) then
+				elseif (x>=30 and y>=2 and x<=37 and y<=4) then
+					exit()
+				elseif (x>=30 and y>=12 and x<=37 and y<=16) then
+					if(y == 12) then
 						drawRewards(1,0)
 						value = 1
-					elseif(y == 12) then
+					elseif(y == 13) then
 						drawRewards(2,0)
 						value = 2
-					elseif(y == 13) then
+					elseif(y == 14) then
 						drawRewards(3,0)
 						value=3
-					elseif(y == 14) then
+					elseif(y == 15) then
 						drawRewards(4,0)
 						value=4
-					elseif(y == 15) then
+					elseif(y == 16) then
 						drawRewards(5,0)
 						value=5
 					end
 				end
 			else
-				if (x>=30 and y>= 16 and x<=37 and y<=19) then
+				if (x>=30 and y>= 17 and x<=37 and y<=19) then
 					updateCards()
 				elseif (x>=4 and x<=7 and y>=16 and y<=19) then
 					drawHeld(0)
@@ -432,7 +435,7 @@ function drawDisplay()
 				end
 			end
 		elseif login == false and e == 'touch' then    
-			if (x >=32 and x<=37 and y >=5 and y<=7) then
+			if (x >=22 and x<=38 and y >=2 and y<=9) then
 				player = p
 				login = true
 				endtime = os.time()+1640
