@@ -16,7 +16,7 @@
 		end
 
 		chat.setDistance(6)
-		chat.setName("§6Больше Менше§l")
+		chat.setName("§6Больше Меньше§l")
 
 		event.shouldInterrupt = function () return false end
 

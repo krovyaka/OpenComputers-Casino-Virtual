@@ -36,6 +36,12 @@ function drawGame()
   gpu.set(4,5,'Комбинации:')
   gpu.set(4,2,'Текущий игрок:')  
   gpu.set(30,11,'Ставка:')  
+  
+  gpu.setBackground(0xffffff)
+  for x=0,4 do
+  	x= x*5 +4
+  	gpu.fill(x,16,4,4,' ')
+end
   gpu.setBackground(0x000000)
   gpu.fill(4,3,24,1,' ')
   gpu.fill(4,6,20,9,' ')
@@ -59,6 +65,7 @@ function drawGame()
   gpu.fill(30,17,8,3,' ')
   gpu.set(31,18,'Начать')
   
+
   --Рисую картинку
   gpu.setBackground(0xffffff) gpu.fill(34,5,1,1,' ') gpu.fill(33,6,3,1,' ') gpu.fill(32,7,5,1,' ') gpu.fill(31,8,7,1,' ') gpu.fill(34,9,1,1,' ') gpu.fill(33,10,3,1,' ')
   gpu.setBackground(0xc6c6c6) gpu.set(33,5,' ') gpu.set(32,6,' ') gpu.set(31,7,' ') gpu.set(30,8,' ') gpu.set(33,9,' ') gpu.set(32,10,' ')
@@ -306,7 +313,7 @@ function drawHeld(x)
 	else
 		card_holds[x+1] = true
 		x= x*5 +4
-		gpu.set(x,15,'Held')
+		gpu.set(x,15,'Hold')
 	end
 end
 
