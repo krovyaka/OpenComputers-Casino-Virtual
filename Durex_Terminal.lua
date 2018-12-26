@@ -31,7 +31,7 @@ local item = {["id"] = "customnpcs:npcMoney",["dmg"]=0,["display_name"]="Money"}
 SIZE = "Down"
 local value = 10
 local login = true
-local player = 'PIDOR'
+local player = ''
 
 function drawDisplay()
   gpu.setResolution(64,20)
@@ -39,7 +39,7 @@ function drawDisplay()
   term.clear()
   gpu.setBackground(0x000000)
   gpu.fill(3,2,60,18," ")
-  gpu.set(15,5,"  Терминал для перевода эмиральдов")
+  gpu.set(15,5,"  Терминал для перевода эмеральдов")
   gpu.set(15,6,"           в дюрексики")
   gpu.set(15,8,"Встаньте на PIM для входа в терминал")
   login = false
@@ -67,7 +67,7 @@ function drawInterface(nick)
   gpu.setBackground(0x000000)
   gpu.fill(3,2,60,18," ")
   gpu.set(15,6,"        Здравствуйте, "..nick)
-  local output = "   На вашем счету "..money_of_player.." дюрексиков   "
+  local output = "   На Вашем счету "..money_of_player.." дюрексиков   "
   gpu.set(33-math.floor(unicode.len(output)/2),7,output)
   
   gpu.set(15,8,"     В терминале "..temp_money.." дюрексиков")
@@ -79,7 +79,7 @@ function drawInterface(nick)
   gpu.set(8,17,"Пополнить баланс")
   gpu.setBackground(0xaa0000)
   gpu.fill(37,16,25,3," ")
-  gpu.set(41,17,"Снять с баланса")
+  gpu.set(41,17,"Снять со счёта")
   login = true
   player = nick
 end
@@ -113,10 +113,10 @@ function giveMoney(val)
       end
     end
     Connector:give(player,temp_value)
-    localsay(player..", вам зачисленно "..temp_value.." дюрексиков на баланс.")
+    localsay(player..", Вам зачислено "..temp_value.." дюрексиков на баланс.")
     drawInterface(player)
   else
-    localsay(player..", у вас не хватает денег в инвентаре.")
+    localsay(player..", у Вас не хватает денег в инвентаре.")
   end
 end
 
@@ -126,7 +126,7 @@ function payMoney(val)
     if (temp_items[i].fingerprint.id==item.id and temp_items[i].fingerprint.dmg == item.dmg) then
       local items_count = temp_items[i].size
       if Connector:get(player)<val then
-        localsay(player..", у вас нехватает дюрексиков на счету.")
+        localsay(player..", у Вас не хватает дюрексиков на счету.")
         return
       end
       if (items_count>= val) then
@@ -137,10 +137,10 @@ function payMoney(val)
           os.sleep(0.2)
         end
         Connector:pay(player,value-val)
-        localsay(player..", вы сняли "..value-val.." дюрексиков с баланса.")
+        localsay(player..", Вы сняли "..value-val.." дюрексиков с баланса.")
         drawInterface(player)
       else
-        localsay(player..", У терминала нету налички, пожалуйста, обратитесь к создателям варпа.")
+        localsay(player..", у терминала нет налички. Пожалуйста, обратитесь к создателям варпа!")
       end
       return
     end
