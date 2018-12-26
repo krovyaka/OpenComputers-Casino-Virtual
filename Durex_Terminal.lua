@@ -1,30 +1,11 @@
 local component = require("component")
-local event = require("event")
 local term = require("term")
 local gpu = component.gpu
 local unicode = require("unicode")
 local computer = require("computer")
 local serialization = require("serialization")
-local chat = component.chat_box
 local pim = component.pim
 local me = component.me_interface
-
-if not require("filesystem").exists("/lib/durexdb.lua") then
-  if not require("component").isAvailable("internet") then 
-  io.stderr:write("Для первого запуска необходима Интернет карта!") 
-  return
-  else 
-  require("shell").execute("wget -q https://pastebin.com/raw/akWrDjEa /lib/durexdb.lua") end
-end
-
-require("durexdb")
-io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
-gpu.setForeground(0xffffff)
-
-chat.setDistance(5)
-chat.setName("§r§6/warp 0§7§l")
-
-event.shouldInterrupt = function () return false end
 
 local item = {["id"] = "customnpcs:npcMoney",["dmg"]=0,["display_name"]="Money"}
 
@@ -45,8 +26,13 @@ function drawDisplay()
   login = false
 end
 
-function localsay(msg)
-  chat.say("§e".. msg)
+function localsay(msg, color)
+  gpu.setForeground(color)
+  gpu.setBackground(0)
+  gpu.set((gpu.getResolution()-unicode.len(msg))/2,4,msg)
+  os.sleep(1.2)
+  gpu.setForeground(0xffffff)
+  gpu.fill(3,4,59,1," ")
 end
 
 function drawInterface(nick)
@@ -113,10 +99,10 @@ function giveMoney(val)
       end
     end
     Connector:give(player,temp_value)
-    localsay(player..", Вам зачислено "..temp_value.." дюрексиков на баланс.")
+    localsay(player..", Вам зачислено "..temp_value.." дюрексиков на баланс.",0x00ff00)
     drawInterface(player)
   else
-    localsay(player..", у Вас не хватает денег в инвентаре.")
+    localsay(player..", у Вас не хватает денег в инвентаре.",0xff0000)
   end
 end
 
@@ -126,7 +112,7 @@ function payMoney(val)
     if (temp_items[i].fingerprint.id==item.id and temp_items[i].fingerprint.dmg == item.dmg) then
       local items_count = temp_items[i].size
       if Connector:get(player)<val then
-        localsay(player..", у Вас не хватает дюрексиков на счету.")
+        localsay(player..", у Вас не хватает дюрексиков на счету.",0xff0000)
         return
       end
       if (items_count>= val) then
@@ -137,10 +123,10 @@ function payMoney(val)
           os.sleep(0.2)
         end
         Connector:pay(player,value-val)
-        localsay(player..", Вы сняли "..value-val.." дюрексиков с баланса.")
+        localsay(player..", Вы сняли "..value-val.." дюрексиков с баланса.",0x00ff00)
         drawInterface(player)
       else
-        localsay(player..", у терминала нет налички. Пожалуйста, обратитесь к создателям варпа!")
+        localsay(player..", у терминала нет налички. Пожалуйста, обратитесь к создателям варпа!",0xff0000)
       end
       return
     end
