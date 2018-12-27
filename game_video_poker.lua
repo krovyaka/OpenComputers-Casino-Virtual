@@ -1,5 +1,4 @@
 local component = require("component")
-local event = require("event")
 local term = require("term")
 local gpu = component.gpu
 local unicode = require("unicode")
@@ -7,22 +6,12 @@ local computer = require("computer")
 local chat = component.chat_box
 local serialization = require("serialization")
 
-if not require("filesystem").exists("/lib/durexdb.lua") then
-if not require("component").isAvailable("internet") then 
-	io.stderr:write("Для первого запуска необходима Интернет карта!") 
-	return
-else 
-	require("shell").execute("wget -q https://pastebin.com/raw/akWrDjEa /lib/durexdb.lua") end
-end
-
-local player = "Durex77"
+local player = "krovyaka"
 local login = false
 local time_sleep = 0.15
 local value = 1
 local game = false
 local card_holds = {false,false,false,false,false}
-local durexdb = require("durexdb")
-io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) gpu.setBackground(0x000000) Connector = DurexDatabase:new(io.read())
 
 function drawGame()
   gpu.setBackground(0x7fa77d)
@@ -114,8 +103,6 @@ gpu.setResolution(40,20)
 
 chat.setDistance(6)
 chat.setName("§6Video_Poker§l")
-
-event.shouldInterrupt = function () return false end
 
 function localsay(msg) chat.say("§e".. msg) end
 
@@ -280,11 +267,9 @@ function startGame()
 	game = true
 	players_cards = {}
 	deck:hinder()
-	give_card_player(0)
-	give_card_player(1)
-	give_card_player(2)
-	give_card_player(3)
-	give_card_player(4)
+    for i = 0, 4 do
+        give_card_player(i)
+    end
 	drawRewards(value,get_combination(players_cards))
 end
 
@@ -342,28 +327,25 @@ function drawDisplay()
   		gpu.setBackground(0xffffff) gpu.fill(x,y-1,2,1,' ') gpu.fill(x-1,y,4,1,' ') gpu.fill(x-2,y+1,6,1,' ') gpu.fill(x-3,y+2,8,1,' ') gpu.fill(x,y+3,2,1,' ') gpu.fill(x-1,y+4,4,1,' ')
   		gpu.setBackground(0xc6c6c6) gpu.set(x-1,y-1,' ') gpu.set(x-2,y,' ') gpu.set(x-3,y+1,' ') gpu.set(x-4,y+2,' ') gpu.set(x-1,y+3,' ') gpu.set(x-2,y+4,' ')
 
-
 		gpu.fill(22,2,17,8,' ')
 		gpu.fill(3,11,36,9,' ')
 		gpu.setForeground(0x000000)	
-		gpu.set(27,6,'Войти')
-		gpu.setForeground(0xffffff)						
+		gpu.set(27,5,'Начать')
+		gpu.set(28,6,'игру')
+		gpu.setForeground(0xffffff)
 		gpu.setBackground(0x000000)
 		gpu.set(12,3,"Video")
 		gpu.set(13,4,"Poker")
-		
 		value = 1
-		
-
 	end
-	
+
 	function rewardPlayer(player,reward,msg)
 		if (reward>0) then
 			localsay("Вы выиграли "..reward)
 			Connector:give(player,reward)
 			gpu.setBackground(0x000000)
-  			gpu.setForeground(0xffffff)
-  			gpu.set(4,3, player..'('..Connector:get(player) ..'дюр.)')
+			gpu.setForeground(0xffffff)
+			gpu.set(4,3, player..'('..Connector:get(player) ..'дюр.)')
 		else
 			localsay("Вы проиграли ")
 		end

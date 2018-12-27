@@ -3,6 +3,8 @@ local computer = require("computer")
 local term = require("term")
 event = require("event")
 
+local admins = {"Durex77", "krovyaka"}
+
 if not require("filesystem").exists("/lib/durexdb.lua") then
   if not require("component").isAvailable("internet") then 
   io.stderr:write("Для первого запуска необходима Интернет карта!") 
@@ -18,13 +20,12 @@ local removeUsers = function(...)
 end
 
 require("durexdb")
-
 event.shouldInterrupt = function () return false end
 
 while true do
   removeUsers(computer.users())
   io.write("Токен-код (скрыт): ")
-  gpu.setForeground(0x000000)
+  gpu.setForeground(0x000000)  
   Connector = DurexDatabase:new(io.read())
   gpu.setForeground(0xffffff)
   result,errorMsg = pcall(loadfile("/home/app.lua"))
