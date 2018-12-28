@@ -125,13 +125,13 @@ while true do
           elseif (left>102)and(left<112)and(top>1)and(top<5) then localsay(p.." поставил "..money.." на 2к1 (верхний ряд)") money = money*3 for i = 3,36,3 do placeBet(p,i,money) end
           elseif (left>102)and(left<112)and(top>5)and(top<9) then localsay(p.." поставил "..money.." на 2к1 (средний ряд)") money = money*3 for i = 2,35,3 do placeBet(p,i,money) end
           elseif (left>102)and(left<112)and(top>9)and(top<13) then localsay(p.." поставил "..money.." на 2к1 (нижний ряд)") money = money*3 for i = 1,34,3 do placeBet(p,i,money) end
-          end          
+          end
         else localsay("§c"..p..", у вас нет столько денег. Пополните счёт в ближайшем терминале.") end
       end
     end
   end
-  localsay("Колесо крутится... Сумма ставок на игру: "  ..  (function() local sum = 0 for k,v in pairs(Bets) do for k1,v1 in pairs(v) do sum = sum + v1 end end return sum/36 end)())  
+  localsay("Колесо крутится... Сумма ставок на игру: "  ..  (function() local sum = 0 for k,v in pairs(Bets) do for k1,v1 in pairs(v) do sum = sum + v1 end end return sum/36 end)())
   local out = Roll()
-  localsay("Выпало число " .. out .. " " .. getColor())
+  localsay("Выпало число " .. out .. " " .. getColor(out))
   for nick,money in pairs(Bets[out]) do Connector:give(nick,money) localsay(nick.." выиграл "..money) end
 end
