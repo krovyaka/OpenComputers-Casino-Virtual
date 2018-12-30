@@ -46,17 +46,21 @@ function drawInterface(nick)
     end
   end
   
-  money_of_player = Connector:get(nick)
+  money_of_player, bonus_money_of_player = Connector:get(nick)
   gpu.setResolution(64,20)
   gpu.setBackground(0xa0a0a0)
   term.clear()
   gpu.setBackground(0x000000)
   gpu.fill(3,2,60,18," ")
   gpu.set(15,6,"        Здравствуйте, "..nick)
-  local output = "   На Вашем счету "..money_of_player.." дюрексиков   "
-  gpu.set(33-math.floor(unicode.len(output)/2),7,output)
   
-  gpu.set(15,8,"     В терминале "..temp_money.." дюрексиков")
+  local p_money = "На Вашем счету "..money_of_player.." дюрексиков"
+  local p_bonus_money = "У вас имеется "..bonus_money_of_player.." бонусов"
+  
+  gpu.set(33-math.floor(unicode.len(p_money)/2),7,p_money)
+  gpu.set(33-math.floor(unicode.len(p_bonus_money)/2),8,p_bonus_money)
+  
+  gpu.set(15,9,"     В терминале "..temp_money.." дюрексиков")
   gpu.set(8,12,"                      ------                       ")
   gpu.set(8,13,"+1 +5 +10 +50 +100    |10  |    -1 -5 -10 -50 -100")
   gpu.set(8,14,"                      ------                       ")

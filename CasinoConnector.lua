@@ -13,8 +13,9 @@ function CasinoConnector:new(token, ip)
 	end
 
 	function obj:get(nick)
-		for temp in internet.request(self.url.."money/get?name="..nick.."&token="..self.token) do      
-			return tonumber(temp)
+		for temp in internet.request(self.url.."money/get?name="..nick.."&token="..self.token) do
+            splitter = string.find(temp,',')
+			return tonumber(string.sub(temp,0,splitter-1)),tonumber(string.sub(temp,splitter+1))
 		end
 	end
 
