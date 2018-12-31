@@ -55,12 +55,10 @@ function drawInterface(nick)
   gpu.set(15,6,"        Здравствуйте, "..nick)
   
   local p_money = "На Вашем счету "..money_of_player.." дюрексиков"
-  local p_bonus_money = "У вас имеется "..bonus_money_of_player.." бонусов"
   
   gpu.set(33-math.floor(unicode.len(p_money)/2),7,p_money)
-  gpu.set(33-math.floor(unicode.len(p_bonus_money)/2),8,p_bonus_money)
+  gpu.set(15,8,"     В терминале "..temp_money.." дюрексиков")
   
-  gpu.set(15,9,"     В терминале "..temp_money.." дюрексиков")
   gpu.set(8,12,"                      ------                       ")
   gpu.set(8,13,"+1 +5 +10 +50 +100    |10  |    -1 -5 -10 -50 -100")
   gpu.set(8,14,"                      ------                       ")

@@ -36,12 +36,8 @@ end
   gpu.fill(4,6,20,9,' ')
   gpu.fill(30,12,8,5,' ')
   gpu.setForeground(0xffffff)
-  p_money,p_bonus = Connector:get(player)
-  if(p_bonus > 0) then
-    gpu.set(4,3, player..'('.. p_money .. '+' .. p_bonus ..'дюр.)')
-  else 
-    gpu.set(4,3, player..'('.. p_money ..'дюр.)')
-  end
+  p_money = Connector:get(player)
+  gpu.set(4,3, player..'('.. p_money ..'дюр.)')
   gpu.set(4,6,'Флеш Рояль')
   gpu.set(4,7,'Стрит Флеш')
   gpu.set(4,8,'Каре')

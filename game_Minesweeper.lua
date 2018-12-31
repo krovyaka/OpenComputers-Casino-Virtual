@@ -5,20 +5,13 @@ end
 
 local component = require("component")
 local gpu = component.gpu
-local event = require("event")
 local term = require("term")
 local unicode = require("unicode")
 local computer = require("computer")
 local serialization = require("serialization")
 
-require("durexdb")
-io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
-
 local bombcount = 5 -- 6 мин = 40% на победу, 5 мин 47% на победу
 local player = ""
-
-computer.removeUser("krovyak")
-event.shouldInterrupt = function () return false end
 
 fieldtypes = {
   ["clear"] = 0x98df94,
@@ -37,8 +30,8 @@ gpu.setForeground(0x000000)
 gpu.set(4,30,"Начинайте игру и ищите поля без мин. Если 3 раза")
 gpu.set(4,31,"подряд не наткнулись на поле с миной, то вы" )
 gpu.set(4,32,"победили. Всего в игре 24 поля, из которых 5 ")
-gpu.set(4,33,"заминированы. Игра стоит 100 дюр, а победа прино-")
-gpu.set(4,34,"сит 200 дюр.")
+gpu.set(4,33,"заминированы. Игра стоит 3 дюр, а победа прино-")
+gpu.set(4,34,"сит 6 дюр.")
 gpu.set(4,37,"Разработчик: krovyaka, Валюта: Durex77, Идея: GG")
 gpu.setBackground(0xe0e0e0)
 gpu.fill(1,27,76,1," ")
@@ -133,7 +126,7 @@ local attempts,ending = 0,0
 while true do
   local _,_,left,top,_,p = event.pull("touch")
   if(left >= 58) and (left <= 75) and (top >= 29) and (top <= 38) then 
-    if(Connector:pay(p,100)) then
+    if(Connector:pay(p,3)) then
       player = p
       generateFields()
       gpu.setBackground(0xffa500)
@@ -156,7 +149,7 @@ while true do
         end
         if(os.time() > ending) then attempts = -1 end
       end
-      if(attempts == 0) then Connector:give(player,200) end
+      if(attempts == 0) then Connector:give(player,6) end
       os.sleep(0.7)
       Animations.reveal()
       gpu.setBackground(0x90ef7e)
