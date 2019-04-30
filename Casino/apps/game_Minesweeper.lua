@@ -14,7 +14,8 @@ local serialization = require("serialization")
 require("durexdb")
 io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
 
-local bombcount = 5 -- 6 мин = 40% на победу, 5 мин 47% на победу
+local BOMB_COUNT= 5 -- 6 мин = 40% на победу, 5 мин 47% на победу
+local BET = 3
 local player = ""
 
 computer.removeUser("krovyak")
@@ -37,8 +38,8 @@ gpu.setForeground(0x000000)
 gpu.set(4,30,"Начинайте игру и ищите поля без мин. Если 3 раза")
 gpu.set(4,31,"подряд не наткнулись на поле с миной, то вы" )
 gpu.set(4,32,"победили. Всего в игре 24 поля, из которых 5 ")
-gpu.set(4,33,"заминированы. Игра стоит 100 дюр, а победа прино-")
-gpu.set(4,34,"сит 200 дюр.")
+gpu.set(4,33,"заминированы. Игра стоит ".. BET .." дюр, а победа прино-")
+gpu.set(4,34,"сит ".. (BET*2) .." дюр.")
 gpu.set(4,37,"Разработчик: krovyaka, Валюта: Durex77, Идея: GG")
 gpu.setBackground(0xe0e0e0)
 gpu.fill(1,27,76,1," ")
@@ -98,7 +99,8 @@ function generateFields()
   Fields = {}
   for i = 1, 24 do Fields[i] = "close" end
   local i = 0
-  while i < bombcount do
+  while i < BOMB_COUNT
+ do
     local rand = math.random(1,24)
     if(Fields[rand] ~= "closebomb") then
       Fields[rand] = "closebomb"
@@ -133,7 +135,7 @@ local attempts,ending = 0,0
 while true do
   local _,_,left,top,_,p = event.pull("touch")
   if(left >= 58) and (left <= 75) and (top >= 29) and (top <= 38) then 
-    if(Connector:pay(p,100)) then
+    if(Connector:pay(p,BET)) then
       player = p
       generateFields()
       gpu.setBackground(0xffa500)
@@ -156,7 +158,7 @@ while true do
         end
         if(os.time() > ending) then attempts = -1 end
       end
-      if(attempts == 0) then Connector:give(player,200) end
+      if(attempts == 0) then Connector:give(player,BET*2) end
       os.sleep(0.7)
       Animations.reveal()
       gpu.setBackground(0x90ef7e)

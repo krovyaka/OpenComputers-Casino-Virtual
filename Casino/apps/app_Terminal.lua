@@ -1,37 +1,18 @@
 local component = require("component")
-local event = require("event")
 local term = require("term")
 local gpu = component.gpu
 local unicode = require("unicode")
 local computer = require("computer")
 local serialization = require("serialization")
-local chat = component.chat_box
 local pim = component.pim
 local me = component.me_interface
-
-if not require("filesystem").exists("/lib/durexdb.lua") then
-  if not require("component").isAvailable("internet") then 
-  io.stderr:write("Для первого запуска необходима Интернет карта!") 
-  return
-  else 
-  require("shell").execute("wget -q https://pastebin.com/raw/akWrDjEa /lib/durexdb.lua") end
-end
-
-require("durexdb")
-io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
-gpu.setForeground(0xffffff)
-
-chat.setDistance(5)
-chat.setName("§r§6/warp 0§7§l")
-
-event.shouldInterrupt = function () return false end
 
 local item = {["id"] = "customnpcs:npcMoney",["dmg"]=0,["display_name"]="Money"}
 
 SIZE = "Down"
 local value = 10
 local login = true
-local player = 'PIDOR'
+local player = ''
 
 function drawDisplay()
   gpu.setResolution(64,20)
@@ -39,14 +20,19 @@ function drawDisplay()
   term.clear()
   gpu.setBackground(0x000000)
   gpu.fill(3,2,60,18," ")
-  gpu.set(15,5,"  Терминал для перевода эмиральдов")
+  gpu.set(15,5,"  Терминал для перевода эмеральдов")
   gpu.set(15,6,"           в дюрексики")
   gpu.set(15,8,"Встаньте на PIM для входа в терминал")
   login = false
 end
 
-function localsay(msg)
-  chat.say("§e".. msg)
+function localsay(msg, color)
+  gpu.setForeground(color)
+  gpu.setBackground(0)
+  gpu.set((gpu.getResolution()-unicode.len(msg))/2,4,msg)
+  os.sleep(1.2)
+  gpu.setForeground(0xffffff)
+  gpu.fill(3,4,59,1," ")
 end
 
 function drawInterface(nick)
@@ -60,17 +46,19 @@ function drawInterface(nick)
     end
   end
   
-  money_of_player = Connector:get(nick)
+  money_of_player, bonus_money_of_player = Connector:get(nick)
   gpu.setResolution(64,20)
   gpu.setBackground(0xa0a0a0)
   term.clear()
   gpu.setBackground(0x000000)
   gpu.fill(3,2,60,18," ")
   gpu.set(15,6,"        Здравствуйте, "..nick)
-  local output = "   На вашем счету "..money_of_player.." дюрексиков   "
-  gpu.set(33-math.floor(unicode.len(output)/2),7,output)
   
+  local p_money = "На Вашем счету "..money_of_player.." дюрексиков"
+  
+  gpu.set(33-math.floor(unicode.len(p_money)/2),7,p_money)
   gpu.set(15,8,"     В терминале "..temp_money.." дюрексиков")
+  
   gpu.set(8,12,"                      ------                       ")
   gpu.set(8,13,"+1 +5 +10 +50 +100    |10  |    -1 -5 -10 -50 -100")
   gpu.set(8,14,"                      ------                       ")
@@ -79,7 +67,7 @@ function drawInterface(nick)
   gpu.set(8,17,"Пополнить баланс")
   gpu.setBackground(0xaa0000)
   gpu.fill(37,16,25,3," ")
-  gpu.set(41,17,"Снять с баланса")
+  gpu.set(41,17,"Снять со счёта")
   login = true
   player = nick
 end
@@ -113,10 +101,10 @@ function giveMoney(val)
       end
     end
     Connector:give(player,temp_value)
-    localsay(player..", вам зачисленно "..temp_value.." дюрексиков на баланс.")
+    localsay(player..", Вам зачислено "..temp_value.." дюрексиков на баланс.",0x00ff00)
     drawInterface(player)
   else
-    localsay(player..", у вас не хватает денег в инвентаре.")
+    localsay(player..", у Вас не хватает денег в инвентаре.",0xff0000)
   end
 end
 
@@ -126,7 +114,7 @@ function payMoney(val)
     if (temp_items[i].fingerprint.id==item.id and temp_items[i].fingerprint.dmg == item.dmg) then
       local items_count = temp_items[i].size
       if Connector:get(player)<val then
-        localsay(player..", у вас нехватает дюрексиков на счету.")
+        localsay(player..", у Вас не хватает дюрексиков на счету.",0xff0000)
         return
       end
       if (items_count>= val) then
@@ -137,10 +125,10 @@ function payMoney(val)
           os.sleep(0.2)
         end
         Connector:pay(player,value-val)
-        localsay(player..", вы сняли "..value-val.." дюрексиков с баланса.")
+        localsay(player..", Вы сняли "..value-val.." дюрексиков с баланса.",0x00ff00)
         drawInterface(player)
       else
-        localsay(player..", У терминала нету налички, пожалуйста, обратитесь к создателям варпа.")
+        localsay(player..", у терминала нет налички. Пожалуйста, обратитесь к создателям варпа!",0xff0000)
       end
       return
     end

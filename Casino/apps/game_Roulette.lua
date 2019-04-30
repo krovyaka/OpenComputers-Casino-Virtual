@@ -4,27 +4,20 @@ if not require("filesystem").exists("/lib/durexdb.lua") then
 end
 local component = require("component")
 local gpu = component.gpu
-local event = require("event")
 local term = require("term")
 local unicode = require("unicode")
 local computer = require("computer")
 local serialization = require("serialization")
 local chat = component.chat_box
 
-computer.removeUser("krovyak")
-event.shouldInterrupt = function () return false end
-
 chat.setName("§r§6Рулетка§7§l")
 chat.setDistance(10)
 function localsay(msg) chat.say("§e".. msg) end
 
-require("durexdb")
-io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
-
-
-values = {[0] = 'z','r','b','r','b','r','b','r','b','r','b','b','r','b','r','b','r','b','r','r','b','r','b','r','b','r','b','r','b','b','r','b','r','b','r','b','r'}
-
-wheel = {0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26,0,32,15,19,4,21,2,25,17}
+local values = {[0] = 'z','r','b','r','b','r','b','r','b','r','b','b','r','b','r','b','r','b','r','r','b','r','b','r','b','r','b','r','b','b','r','b','r','b','r','b','r'}
+local wheel = {0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26,0,32,15,19,4,21,2,25,17}
+local red = {1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36}
+local black = {2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35}
 
 function drawNumber(left,top,number)
   if(values[number] == 'r') then gpu.setBackground(0xff0000)
@@ -34,6 +27,13 @@ function drawNumber(left,top,number)
   gpu.set(left+2,top+1,tostring(number))
 end
 
+function getColor(number)
+    if(number == 0) then return "" end
+    for i = 1,#red do
+        if(red[i] == number) then return "(красное)" end
+    end
+    return "(чёрное)" end
+
 gpu.setResolution(112,21)
 gpu.setBackground(0xffffff)
 term.clear()
@@ -41,6 +41,7 @@ gpu.setForeground(0x000000)
 gpu.set(103,14,"Ставки:")
 gpu.set(103,15,"ЛКМ 1 дюр")
 gpu.set(103,16,"ПКМ 10 дюр")
+gpu.setForeground(0x777777)
 gpu.set(103,18,"Автор:")
 gpu.set(103,19,"krovyaka")
 gpu.setForeground(0xffffff)
@@ -106,7 +107,7 @@ while true do
       local number,money = 0,1+clicktype*9
       if(fixClicks(left,top)) then
         if(Connector:pay(p,money)) then
-          if(endbets == 0) then endbets = os.time()+2160 localsay("Рулетка крутится через 30 сек после первой ставки.") end  
+          if(endbets == 0) then endbets = os.time()+1080 localsay("Рулетка крутится через 15 сек после первой ставки.") end  
           if(left>18)and(left<102)and(top>1)and(top<13) then
             number = getNumberClick(left,top)
           end
@@ -117,20 +118,20 @@ while true do
           elseif (left>74)and(left<102)and(top>13)and(top<17) then localsay(p.." поставил "..money.." на третью 12") money = money*3 for i = 25, 36 do placeBet(p,i,money) end
           elseif (left>18)and(left<32)and(top>17)and(top<21) then localsay(p.." поставил "..money.." на 1 до 18") money = money*2 for i = 1, 18 do placeBet(p,i,money) end
           elseif (left>32)and(left<46)and(top>17)and(top<21) then localsay(p.." поставил "..money.." на чётное") money = money*2 for i = 2,36,2 do placeBet(p,i,money) end
-          elseif (left>46)and(left<60)and(top>17)and(top<21) then localsay(p.." поставил "..money.." на красное") placeBetByTable({1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36},p,money*2)
-          elseif (left>60)and(left<74)and(top>17)and(top<21) then localsay(p.." поставил "..money.." на чёрное") placeBetByTable({2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35},p,money*2)
+          elseif (left>46)and(left<60)and(top>17)and(top<21) then localsay(p.." поставил "..money.." на красное") placeBetByTable(red,p,money*2)
+          elseif (left>60)and(left<74)and(top>17)and(top<21) then localsay(p.." поставил "..money.." на чёрное") placeBetByTable(black,p,money*2)
           elseif (left>74)and(left<88)and(top>17)and(top<21) then localsay(p.." поставил "..money.." на нечётное") money = money*2 for i = 1,35,2 do placeBet(p,i,money) end
           elseif (left>88)and(left<102)and(top>17)and(top<21) then localsay(p.." поставил "..money.." на 19 до 36") money = money*2 for i = 19, 36 do placeBet(p,i,money) end
-          elseif (left>102)and(left<112)and(top>1)and(top<5) then localsay(p.." поставил "..money.." на 2к1(верхний ряд)") money = money*3 for i = 3,36,3 do placeBet(p,i,money) end
-          elseif (left>102)and(left<112)and(top>5)and(top<9) then localsay(p.." поставил "..money.." на 2к1(средний ряд)") money = money*3 for i = 2,35,3 do placeBet(p,i,money) end
-          elseif (left>102)and(left<112)and(top>9)and(top<13) then localsay(p.." поставил "..money.." на 2к1(нижний ряд)") money = money*3 for i = 1,34,3 do placeBet(p,i,money) end
-          end          
-        else localsay(""..p..", у вас нет столько денег. Пополните счёт в ближайшем терминале.") end
+          elseif (left>102)and(left<112)and(top>1)and(top<5) then localsay(p.." поставил "..money.." на 2к1 (верхний ряд)") money = money*3 for i = 3,36,3 do placeBet(p,i,money) end
+          elseif (left>102)and(left<112)and(top>5)and(top<9) then localsay(p.." поставил "..money.." на 2к1 (средний ряд)") money = money*3 for i = 2,35,3 do placeBet(p,i,money) end
+          elseif (left>102)and(left<112)and(top>9)and(top<13) then localsay(p.." поставил "..money.." на 2к1 (нижний ряд)") money = money*3 for i = 1,34,3 do placeBet(p,i,money) end
+          end
+        else localsay("§c"..p..", у вас нет столько денег. Пополните счёт в ближайшем терминале.") end
       end
     end
   end
-  localsay("Колесо крутится...")  
+  localsay("Колесо крутится... Сумма ставок на игру: "  ..  (function() local sum = 0 for k,v in pairs(Bets) do for k1,v1 in pairs(v) do sum = sum + v1 end end return sum/36 end)())
   local out = Roll()
-  localsay("Выпало число "..out)
+  localsay("Выпало число " .. out .. " " .. getColor(out))
   for nick,money in pairs(Bets[out]) do Connector:give(nick,money) localsay(nick.." выиграл "..money) end
 end

@@ -2,26 +2,12 @@ local component = require("component")
 local term = require("term")
 local gpu = component.gpu
 local unicode = require("unicode")
-local event = require("event")
 local computer = require("computer")
 local serialization = require("serialization")
 
-if not require("filesystem").exists("/lib/durexdb.lua") then
-  if not require("component").isAvailable("internet") then 
-  io.stderr:write("Для первого запуска необходима Интернет карта!") 
-  return
-  else 
-  require("shell").execute("wget -q https://pastebin.com/raw/akWrDjEa /lib/durexdb.lua") end
-end
-
-require("durexdb")
---io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
-Connector = DurexDatabase:new("40b074cdd9ce49e5b60651ada335ef41")
 gpu.setForeground(0xffffff)
 
---event.shouldInterrupt = function () return false end
-
-local player = "Durex77"
+local player = "krovyaka"
 
 function drawCheck(nick)
   money_of_player = Connector:get(nick)

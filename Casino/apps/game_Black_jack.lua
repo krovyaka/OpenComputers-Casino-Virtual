@@ -1,5 +1,4 @@
 local component = require("component")
-local event = require("event")
 local term = require("term")
 local gpu = component.gpu
 local unicode = require("unicode")
@@ -7,23 +6,10 @@ local computer = require("computer")
 local chat = component.chat_box
 local serialization = require("serialization")
 
-if not require("filesystem").exists("/lib/durexdb.lua") then
-if not require("component").isAvailable("internet") then 
-	io.stderr:write("Для первого запуска необходима Интернет карта!") 
-	return
-else 
-	require("shell").execute("wget -q https://pastebin.com/raw/akWrDjEa /lib/durexdb.lua") end
-end
-
 chat.setDistance(6)
 chat.setName("§6blackjack§l")
 
-event.shouldInterrupt = function () return false end
-
-local durexdb = require("durexdb")
-
 local login,blackjack,player,value,players_cards,diller_cards,time_sleep,time_sleep_end = false,false,'PIDOR',1,{},{},0.2,1.5
-io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) gpu.setBackground(0x000000) Connector = DurexDatabase:new(io.read())
 
 function localsay(msg) chat.say("§e".. msg) end
 
