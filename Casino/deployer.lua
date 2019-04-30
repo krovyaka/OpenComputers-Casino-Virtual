@@ -14,6 +14,10 @@ local LAUNCHER_PASTEBIN = "m5Ziic7f"
 
 local GAMES = {
   -- {NAME, PASTEBIN}
+  {"Terminal", "uVLCCs4G"},
+  {"Checker", "cBmAA567"},
+  {"Video Poker", "W7jFesBV"},
+  {"Minesweeper", "cTT7MkRw"},
   {"Roulette", "RD2AYAEL"},
   {"Black Jack", "mmcZ1SZp"}
 }
