@@ -7,17 +7,20 @@ else
 end
 
 require("durexdb") 
-Connector = DurexDatabase:new('40b074cdd9ce49e5b60651ada335ef41')
+Connector = DurexDatabase:new('8bc882f914fc4f74996712c00f860787')
 
 local component = require("component")
 local gpu = component.gpu
 local unicode = require("unicode")
-local chest_input = component.proxy("7469d49d-14e8-4f70-9b0e-75836f5b26d4")
+local event = require("event")
+local chest_input = component.crystal
 local sensor = component.openperipheral_sensor
 local me_interface = component.me_interface
+local redstone = component.redstone
 
 local MONEY_ITEM = {id="minecraft:cobblestone"}
 local X_OFFSET, Y_OFFSET, Z_OFFSET = -2, -2, 2
+local REDSTONE_OUTPUT_SIDE = 5
 local OUTPUT_BUTTONS = {
   {57, 15, 1},
   {57, 19, 10},
@@ -37,13 +40,11 @@ function filledText(x, y, text, len)
 end
 
 function suckMoney()
-  chest_input.condenseItems()
   local sum = 0
   for i = 1, 108 do
     local item = chest_input.getStackInSlot(i)
-    if not item then return sum end
-    if item.id == "customnpcs:npcMoney" then
-      sum = sum + chest_input.pushItem('NORTH', i)
+    if item and item.id == MONEY_ITEM.id then -- ПРОВЕРЯТЬ ТЩАТЕЛЬНЕЕ
+      sum = sum + chest_input.pushItem('DOWN', i)
     end
   end
   return sum
@@ -68,7 +69,17 @@ function initDraw()
   gpu.set(29, 16, 'Деньги на счету:')
   gpu.set(29, 19, 'Деньги в терминале:')
   middleTextAlign(68, 13, "ВЫВОД СРЕДСТВ")
+  middleTextAlign(38, 3, "Терминал для перевода эмов в дюрексики 2.0")
+  middleTextAlign(38, 4, "Новая версия запущена в тестовом режиме из-за запрета PIM")
 end
+
+function message(text)
+  gpu.setForeground(0x00ff00)
+  middleTextAlign(38, 6, text)
+  os.sleep(1.5)
+  gpu.fill(1, 6, 80, 1, ' ')
+end
+
 
 function getPositionedPlayers()
   local players = sensor.getPlayers()
@@ -82,17 +93,78 @@ function getPositionedPlayers()
   return positioned
 end
 
+function handleClick(x, y, player)
+  if (x > 3 and x <= 24 and y >= 14 and y <= 25) then
+    local money = suckMoney()
+    Connector:give(player, money)
+    message(money .. "$ успешно добавлены на Ваш счёт.")
+    return
+  end
+  
+  for i = 1, #OUTPUT_BUTTONS do
+    local button = OUTPUT_BUTTONS[i]
+    if x >= button[1] and x <= button[1] + 10 and y >= button[2] and y <= button[2] + 3 then
+      local money = giveMoney(player, button[3])
+      message(money .. "$ успешно снято с Вашего счёта.")
+      return
+    end
+  end
+end
+
+function dynamicDraw(player)
+  gpu.setForeground(0xffff00)
+  filledText(29, 14, player or '', 28)
+  filledText(29, 17, player and tostring(Connector:get(player)) or '', 28)
+  
+  local executed, qty = pcall(function() return me_interface.getItemDetail(MONEY_ITEM).basic().qty end)
+  filledText(29, 20, executed and tostring(qty) or '0', 28)
+end
+
+function giveMoney(player, qty)
+  if not Connector:pay(player, qty) then
+    message('Недостаточно средств для вывода')
+  end
+  if qty == 0 then return 0 end
+  
+  local gived = 0
+  while true do
+    local executed, g = pcall(function() return me_interface.exportItem(MONEY_ITEM, "UP", qty < 64 and qty or 64).size end)
+    g = executed and g or 0
+    qty = qty - g
+    gived = gived + g
+    if g == 0 or qty == 0 then
+      Connector:give(player, gived)
+      return gived
+    end
+  end
+end
+
+function redstoneChangeState(state)
+  if state then
+    if redstone.getOutput(REDSTONE_OUTPUT_SIDE) == 0 then
+      redstone.setOutput(REDSTONE_OUTPUT_SIDE, 15)
+    end
+  else
+    if redstone.getOutput(REDSTONE_OUTPUT_SIDE) > 0 then
+      redstone.setOutput(REDSTONE_OUTPUT_SIDE, 0)
+    end
+  end
+end
+
+
 initDraw()
 local currentPlayer = nil
 while true do
-  os.sleep(0.5)
-  p = getPositionedPlayers()[1]
-  
-  if currentPlayer ~= p then
-    currentPlayer = p
-    gpu.setForeground(0xffff00)
-    filledText(29, 14, p or '', 28)
-    filledText(29, 17, p and tostring(Connector:get(p)) or '', 28)
-    filledText(29, 20, me_interface.getItemDetail(MONEY_ITEM).basic().qty)
+  local _, _, x, y, _, player = event.pull(0.5, "touch")
+  if player and player == currentPlayer then
+    handleClick(x, y, player)
+    dynamicDraw(player)
+  else
+    local player = getPositionedPlayers()[1]
+    if currentPlayer ~= player then
+      currentPlayer = player
+      dynamicDraw(player)
+    end
   end
+  redstoneChangeState(currentPlayer ~= nil)
 end
