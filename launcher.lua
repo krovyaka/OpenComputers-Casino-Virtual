@@ -77,7 +77,7 @@ removeUsers(computer.users())
 event.shouldInterrupt = function () return false end
 io.write("Токен-код (скрыт): ")
 removeUsers(computer.users())
-gpu.setForeground(0x000000)  
+gpu.setForeground(0x000000)
 Connector = DurexDatabase:new(io.read())
 while true do
   gpu.setForeground(0xffffff)
