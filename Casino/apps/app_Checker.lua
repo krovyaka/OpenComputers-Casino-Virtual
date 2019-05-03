@@ -31,6 +31,7 @@ function drawTop()
   gpu.fill(3,2,28,14," ")
   gpu.set(4,3,"Топ лакерков в казино:")
   for i = 1,10 do
+    if not tbl[i] then break end
     gpu.set(4,3+i,i .. ". " .. tbl[i][1] .. " " .. math.floor(tbl[i][2]) .. " дюр")
   end
   os.sleep(4)
@@ -43,6 +44,7 @@ function drawBottom()
   gpu.fill(3,2,28,14," ")
   gpu.set(4,3,"Топ анлакеров в казино:")
   for i = 1,10 do
+    if not tbl[i] then break end
     gpu.set(4,3+i,i .. ". " .. tbl[#tbl-i+1][1] .. " " .. math.floor(tbl[#tbl-i+1][2]) .. " дюр")
   end
   os.sleep(10)

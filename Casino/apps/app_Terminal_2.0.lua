@@ -1,13 +1,3 @@
---if not require("filesystem").exists("/lib/durexdb.lua") then
---if not require("component").isAvailable("internet") then 
---	io.stderr:write("Для первого запуска необходима Интернет карта!") 
---	return
---else 
---	require("shell").execute("wget -q https://pastebin.com/raw/bK7wx8wB /lib/durexdb.lua") end
---end
---require("durexdb") 
---Connector = DurexDatabase:new('8bc882f914fc4f74996712c00f860787')
-
 local component = require("component")
 local gpu = component.gpu
 local unicode = require("unicode")
@@ -17,7 +7,7 @@ local sensor = component.openperipheral_sensor
 local me_interface = component.me_interface
 local redstone = component.redstone
 
-local MONEY_ITEM = {id="minecraft:cobblestone"}
+local MONEY_ITEM = {id="customnpcs:npcMoney"}
 local X_OFFSET, Y_OFFSET, Z_OFFSET = 4, 0, 0
 local REDSTONE_OUTPUT_SIDE = 2
 local OUTPUT_BUTTONS = {
@@ -86,7 +76,7 @@ function getPositionedPlayers()
   local positioned = {}
   for i = 1, #players do
     local executed, pos = pcall(function() return sensor.getPlayerByName(players[i].name).basic().position end)
-    if executed and math.floor(pos.x) == X_OFFSET and math.floor(pos.y) == Y_OFFSET and math.floor(pos.z) == Z_OFFSET then
+    if executed and pos.x > X_OFFSET and pos.x < X_OFFSET + 2 and math.floor(pos.y) == Y_OFFSET and math.floor(pos.z) == Z_OFFSET then -- КОСТЫЛЬ
       table.insert(positioned, players[i].name)
     end
   end
