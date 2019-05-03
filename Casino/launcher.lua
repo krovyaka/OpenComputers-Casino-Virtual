@@ -6,7 +6,7 @@ local admins = {"Durex77", "krovyaka", "krovyak", "GoodGame", "GooodGame", "SkyD
 
 if not require("filesystem").exists("/lib/durexdb.lua") then
     if not require("component").isAvailable("internet") then io.stderr:write("Для первого запуска необходима Интернет карта!") return
-    else require("shell").execute("wget -q https://pastebin.com/raw/akWrDjEa /lib/durexdb.lua") end
+    else require("shell").execute("wget -q https://pastebin.com/raw/bK7wx8wB /lib/durexdb.lua") end
 end
 
 local removeUsers = function(...)

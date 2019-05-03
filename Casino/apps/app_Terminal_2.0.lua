@@ -1,13 +1,12 @@
-if not require("filesystem").exists("/lib/durexdb.lua") then
-if not require("component").isAvailable("internet") then 
-	io.stderr:write("Для первого запуска необходима Интернет карта!") 
-	return
-else 
-	require("shell").execute("wget -q https://pastebin.com/raw/bK7wx8wB /lib/durexdb.lua") end
-end
-
-require("durexdb") 
-Connector = DurexDatabase:new('8bc882f914fc4f74996712c00f860787')
+--if not require("filesystem").exists("/lib/durexdb.lua") then
+--if not require("component").isAvailable("internet") then 
+--	io.stderr:write("Для первого запуска необходима Интернет карта!") 
+--	return
+--else 
+--	require("shell").execute("wget -q https://pastebin.com/raw/bK7wx8wB /lib/durexdb.lua") end
+--end
+--require("durexdb") 
+--Connector = DurexDatabase:new('8bc882f914fc4f74996712c00f860787')
 
 local component = require("component")
 local gpu = component.gpu
@@ -19,14 +18,14 @@ local me_interface = component.me_interface
 local redstone = component.redstone
 
 local MONEY_ITEM = {id="minecraft:cobblestone"}
-local X_OFFSET, Y_OFFSET, Z_OFFSET = -2, -2, 2
-local REDSTONE_OUTPUT_SIDE = 5
+local X_OFFSET, Y_OFFSET, Z_OFFSET = 4, 0, 0
+local REDSTONE_OUTPUT_SIDE = 2
 local OUTPUT_BUTTONS = {
   {57, 15, 1},
   {57, 19, 10},
-  {57, 23, 100},
   {69, 15, 16},
   {69, 19, 64},
+  {57, 23, 100},
   {69, 23, 512}
 }
 
@@ -43,7 +42,7 @@ function suckMoney()
   local sum = 0
   for i = 1, 108 do
     local item = chest_input.getStackInSlot(i)
-    if item and item.id == MONEY_ITEM.id then -- ПРОВЕРЯТЬ ТЩАТЕЛЬНЕЕ
+    if item and not item.nbt_hash and item.id == MONEY_ITEM.id then
       sum = sum + chest_input.pushItem('DOWN', i)
     end
   end
@@ -51,6 +50,7 @@ function suckMoney()
 end
 
 function initDraw()
+  require("term").clear()
   gpu.setResolution(80, 25)
   gpu.setBackground(0x00ff00)
   gpu.fill(1, 13, 25, 13, ' ')
@@ -69,14 +69,14 @@ function initDraw()
   gpu.set(29, 16, 'Деньги на счету:')
   gpu.set(29, 19, 'Деньги в терминале:')
   middleTextAlign(68, 13, "ВЫВОД СРЕДСТВ")
-  middleTextAlign(38, 3, "Терминал для перевода эмов в дюрексики 2.0")
-  middleTextAlign(38, 4, "Новая версия запущена в тестовом режиме из-за запрета PIM")
+  middleTextAlign(40, 3, "Терминал для перевода эмов в дюрексики 2.0")
+  middleTextAlign(40, 4, "Новая версия запущена в тестовом режиме из-за запрета PIM")
 end
 
 function message(text)
   gpu.setForeground(0x00ff00)
   middleTextAlign(38, 6, text)
-  os.sleep(1.5)
+  os.sleep(0.7)
   gpu.fill(1, 6, 80, 1, ' ')
 end
 
@@ -105,7 +105,7 @@ function handleClick(x, y, player)
     local button = OUTPUT_BUTTONS[i]
     if x >= button[1] and x <= button[1] + 10 and y >= button[2] and y <= button[2] + 3 then
       local money = giveMoney(player, button[3])
-      message(money .. "$ успешно снято с Вашего счёта.")
+      message(money > 0 and money .. "$ успешно снято с Вашего счёта." or "Недостаточно средств")
       return
     end
   end
@@ -115,27 +115,28 @@ function dynamicDraw(player)
   gpu.setForeground(0xffff00)
   filledText(29, 14, player or '', 28)
   filledText(29, 17, player and tostring(Connector:get(player)) or '', 28)
-  
-  local executed, qty = pcall(function() return me_interface.getItemDetail(MONEY_ITEM).basic().qty end)
-  filledText(29, 20, executed and tostring(qty) or '0', 28)
+  if player then
+    local executed, qty = pcall(function() return me_interface.getItemDetail(MONEY_ITEM).basic().qty end)
+    filledText(29, 20, executed and tostring(qty) or '0', 28)
+  else
+    filledText(29, 20, '', 28)
+  end
 end
 
 function giveMoney(player, qty)
-  if not Connector:pay(player, qty) then
-    message('Недостаточно средств для вывода')
-  end
   if qty == 0 then return 0 end
-  
   local gived = 0
+  if not Connector:pay(player, qty) then return 0 end
   while true do
     local executed, g = pcall(function() return me_interface.exportItem(MONEY_ITEM, "UP", qty < 64 and qty or 64).size end)
     g = executed and g or 0
     qty = qty - g
     gived = gived + g
-    if g == 0 or qty == 0 then
-      Connector:give(player, gived)
+    if g == 0 and qty > 0 then -- Возврат средств, которые не были выданы
+      Connector:give(player, qty)
       return gived
     end
+    if qty == 0 then return gived end
   end
 end
 
