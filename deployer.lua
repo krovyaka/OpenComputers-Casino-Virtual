@@ -6,6 +6,10 @@ end
 local computer = require("computer")
 local shell = require("shell")
 
+local args = shell.parse(...)
+
+local DEV_PROFILE = args[1] == "dev"
+
 local AUTORUN_CONTENT = [[require("event").shouldInterrupt = function () return false end
 os.sleep(4)
 require("shell").execute("/home/1")]]
@@ -57,12 +61,19 @@ local function saveApplication(app)
     print("Application is saved")
 end
 
+local function saveApplicationInfo(app)
+  print("Application info saving begins...")
+  local branch = DEV_PROFILE and "develop" or "master"
+  writeToFile("/home/appInfo.lua", string.format('return {name="%s", label="%s", branch="%s"}', app[2], app[1], branch))
+  print("Application info is saved")
+end
 
 local function deploy(selected)
   print('The deployment of the "' .. selected[1] .. '" application begins.')
   saveAutorun()
   saveLauncher()
   saveApplication(selected)
+  saveApplicationInfo(selected)
   print('Application successfully deployed. Press ENTER to restart...')
   io.read()
   shell.execute("reboot")

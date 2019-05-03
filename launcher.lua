@@ -3,6 +3,7 @@ local computer = require("computer")
 local term = require("term")
 event = require("event")
 local admins = {"Durex77", "krovyaka", "krovyak", "GoodGame", "GooodGame", "SkyDrive_"}
+local shell = require("shell")
 
 if not require("filesystem").exists("/lib/durexdb.lua") then
     if not require("component").isAvailable("internet") then io.stderr:write("Для первого запуска необходима Интернет карта!") return
@@ -15,7 +16,21 @@ local removeUsers = function(...)
   end
 end
 
-function drawError(reason)
+function updateFromGitHub()
+  local app = loadfile("/home/appInfo.lua")()
+  shell.execute("wget -q https://raw.githubusercontent.com/krovyaka/OpenComputers-Casino/" .. app.branch .. "/apps/" .. app.name .. ".lua /home/app.lua")
+  error("Application was updated")
+end
+
+local function hideToken(s)
+  if not s then return nil end
+  local token = string.match(s, "token=[ a-z0-9]*")
+  if not token then return s end
+  local b, e = string.find(s, token)
+  return s:sub(0, b - 1) .. "token=SECRET" .. s:sub(e + 1)
+end
+
+local function drawError(reason)
   gpu.setResolution(49,20)
   gpu.setBackground(0x705f5f)
   gpu.setForeground(0xffffff)
@@ -24,7 +39,7 @@ function drawError(reason)
   if(reason == nil)
     then reason = "Успешное завершение программы"
   end
-  print(reason)
+  print(hideToken(reason))
   gpu.setResolution(80,20)
   gpu.setBackground(0xFFB300)
   gpu.fill(50,6,31,15, ' ')
@@ -32,16 +47,24 @@ function drawError(reason)
   gpu.set(51,7,'Кнопка доступна для:')
   for i = 1,#admins do gpu.set(51,8+i,admins[i]) end
   gpu.setForeground(0xffffff)
+
+  gpu.setBackground(0x800080)
+  gpu.fill(71,1,10,5, ' ')
+  gpu.set(72,3,'Обновить')
+
   gpu.setBackground(0xa6743c)
-  gpu.fill(50,1,31,5, ' ')
-  gpu.set(60,3,'Перезапустить')
+  gpu.fill(50,1,21,5, ' ')
+  gpu.set(54,3,'Перезапустить')
   gpu.setBackground(0)
   
   while true do
     local _,_,x,y,_,nickname = event.pull("touch")
     for i = 1,#admins do
       if(nickname == admins[i]) then
-        if(x >= 50) and (y<=4) then 
+        if (x >= 50) and (x <= 70) and (y<=4) then 
+          return
+        elseif (x >= 71) and (y<=4) then
+          updateFromGitHub()
           return
         end
       end
