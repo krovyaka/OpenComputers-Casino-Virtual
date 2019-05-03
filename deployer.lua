@@ -14,12 +14,13 @@ local LAUNCHER_PASTEBIN = "m5Ziic7f"
 
 local GAMES = {
   -- {NAME, PASTEBIN}
-  {"Terminal", "uVLCCs4G"},
-  {"Checker", "cBmAA567"},
-  {"Video Poker", "W7jFesBV"},
-  {"Minesweeper", "cTT7MkRw"},
-  {"Roulette", "RD2AYAEL"},
-  {"Black Jack", "mmcZ1SZp"}
+  {"Terminal (PIM)", "app_Terminal.0"},
+  {"Terminal (Chest)", "app_Terminal_2.0"},
+  {"Checker", "app_Checker"},
+  {"Video Poker", "game_video_poker"},
+  {"Minesweeper", "game_Minesweeper"},
+  {"Roulette", "game_Roulette"},
+  {"Black Jack", "game_Roulette"}
 }
 
 local function writeToFile(path, content)
@@ -52,7 +53,7 @@ end
 
 local function saveApplication(app)
     print("Application saving begins...")
-    shell.execute("pastebin get -f " .. app[2] .. " app.lua")
+    shell.execute("wget -q https://raw.githubusercontent.com/krovyaka/OpenComputers-Casino/master/apps/" .. app[2] .. ".lua /home/app.lua")
     print("Application is saved")
 end
 
