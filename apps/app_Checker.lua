@@ -1,3 +1,5 @@
+1 = ERROR
+
 local component = require("component")
 local term = require("term")
 local gpu = component.gpu
