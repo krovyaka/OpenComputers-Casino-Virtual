@@ -1,12 +1,9 @@
 local component = require("component")
 local term = require("term")
 local gpu = component.gpu
-local unicode = require("unicode")
-local computer = require("computer")
 local chat = component.chat_box
-local serialization = require("serialization")
 
-local player = "krovyaka"
+local player = "p"
 local login = false
 local time_sleep = 0.15
 local value = 1

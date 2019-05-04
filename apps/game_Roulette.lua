@@ -1,13 +1,6 @@
-if not require("filesystem").exists("/lib/durexdb.lua") then
-    if not require("component").isAvailable("internet") then io.stderr:write("Для первого запуска необходима Интернет карта!") return
-    else require("shell").execute("wget -q https://pastebin.com/raw/akWrDjEa /lib/durexdb.lua") end
-end
 local component = require("component")
 local gpu = component.gpu
 local term = require("term")
-local unicode = require("unicode")
-local computer = require("computer")
-local serialization = require("serialization")
 local chat = component.chat_box
 
 chat.setName("§r§6Рулетка§7§l")

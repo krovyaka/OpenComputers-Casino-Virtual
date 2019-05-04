@@ -2,8 +2,6 @@ local component = require("component")
 local term = require("term")
 local gpu = component.gpu
 local unicode = require("unicode")
-local computer = require("computer")
-local serialization = require("serialization")
 local pim = component.pim
 local me = component.me_interface
 
