@@ -18,7 +18,7 @@ function drawCheck(nick)
     gpu.setBackground(0xaa0000)
     gpu.fill(3, 13, 28, 3, " ")
     gpu.set(9, 14, "Проверить баланс")
-    gpu.setBackground(0x888888)
+    gpu.setBackground(0x800080)
     gpu.set(25, 2, "Лакеры")
     gpu.set(3, 2, "Анлакеры")
 end

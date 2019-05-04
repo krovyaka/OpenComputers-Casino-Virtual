@@ -46,8 +46,12 @@ end
 
 local function saveAutorun()
     print("Autorun saving begins...")
-    writeToFile("/autorun.lua", AUTORUN_CONTENT)
-    print("Autorun is saved")
+    if BRANCH == "develop" then
+        print("The application is deployed in DEV mode. Autorun file is not needed.")
+    else
+        writeToFile("/autorun.lua", AUTORUN_CONTENT)
+        print("Autorun is saved")
+    end
 end
 
 local function saveLauncher()
