@@ -1,22 +1,11 @@
-if not require("filesystem").exists("/lib/durexdb.lua") then
-if not require("component").isAvailable("internet") then 
-	io.stderr:write("Для первого запуска необходима Интернет карта!") 
-	return
-else 
-	require("shell").execute("wget -q https://pastebin.com/raw/fVMdsicr /lib/durexdb.lua") end
-end
-
 local component = require("component")
 local event = require("event")
 local term = require("term")
 local gpu = component.gpu
 local unicode = require("unicode")
-local computer = require("computer")
 
 local dragging,game,player,lastx,ending,cooldown,flag = false,false,"",0,0,0,true
 local map,start,finish,currentPos = {},{1,17},{35,17}, {1,17}
-event.shouldInterrupt = function () return false end
-require("durexdb") io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
 
 function startGenerate()
   for i=1,35 do 

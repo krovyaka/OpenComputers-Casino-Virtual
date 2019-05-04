@@ -1,15 +1,12 @@
 local component = require("component")
 local term = require("term")
 local gpu = component.gpu
-local unicode = require("unicode")
-local computer = require("computer")
 local chat = component.chat_box
-local serialization = require("serialization")
 
 chat.setDistance(6)
 chat.setName("§6blackjack§l")
 
-local login,blackjack,player,value,players_cards,diller_cards,time_sleep,time_sleep_end = false,false,'PIDOR',1,{},{},0.2,1.5
+local login,blackjack,player,value,players_cards,diller_cards,time_sleep,time_sleep_end = false,false,'p',1,{},{},0.2,1.5
 
 function localsay(msg) chat.say("§e".. msg) end
 

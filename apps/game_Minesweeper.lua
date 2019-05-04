@@ -1,25 +1,13 @@
-if not require("filesystem").exists("/lib/durexdb.lua") then
-    if not require("component").isAvailable("internet") then io.stderr:write("Для первого запуска необходима Интернет карта!") return
-    else require("shell").execute("wget -q https://pastebin.com/raw/akWrDjEa /lib/durexdb.lua") end
-end
-
 local component = require("component")
 local gpu = component.gpu
 local event = require("event")
 local term = require("term")
 local unicode = require("unicode")
 local computer = require("computer")
-local serialization = require("serialization")
-
-require("durexdb")
-io.write("Токен-код (скрыт): ") gpu.setForeground(0x000000) Connector = DurexDatabase:new(io.read())
 
 local BOMB_COUNT= 5 -- 6 мин = 40% на победу, 5 мин 47% на победу
 local BET = 3
 local player = ""
-
-computer.removeUser("krovyak")
-event.shouldInterrupt = function () return false end
 
 fieldtypes = {
   ["clear"] = 0x98df94,
