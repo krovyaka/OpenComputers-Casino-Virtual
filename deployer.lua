@@ -17,7 +17,7 @@ local GAMES = {
     { "Video Poker", "game_video_poker" },
     { "Minesweeper", "game_Minesweeper" },
     { "Roulette", "game_Roulette" },
-    { "Black Jack", "game_Roulette" }
+    { "Black Jack", "game_Black_jack" }
 }
 
 local MODES = {
