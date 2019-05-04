@@ -7,7 +7,7 @@ local shell = require("shell")
 
 if not require("filesystem").exists("/lib/durexdb.lua") then
     if not require("component").isAvailable("internet") then io.stderr:write("Для первого запуска необходима Интернет карта!") return
-    else require("shell").execute("wget -q https://pastebin.com/raw/bK7wx8wB /lib/durexdb.lua") end
+    else shell.execute("wget -q https://pastebin.com/raw/bK7wx8wB /lib/durexdb.lua") end
 end
 
 local removeUsers = function(...)
@@ -18,8 +18,7 @@ end
 
 function updateFromGitHub()
   local app = loadfile("/home/appInfo.lua")()
-  shell.execute("wget -q https://raw.githubusercontent.com/krovyaka/OpenComputers-Casino/" .. app.branch .. "/apps/" .. app.name .. ".lua /home/app.lua")
-  error("Application was updated")
+  shell.execute("wget -fq https://raw.githubusercontent.com/krovyaka/OpenComputers-Casino/" .. app.branch .. "/apps/" .. app.name .. ".lua /home/app.lua")
 end
 
 local function hideToken(s)
