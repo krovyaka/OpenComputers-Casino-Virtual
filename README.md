@@ -1,9 +1,6 @@
-# OpenComputers Casino
+# OpenComputers Casino (unsupproted)
 
+New releases here:
+https://github.com/krovyaka/OpenComputers-Casino-NoVirtual
 
-### Requirements
-* OpenComputers
-* Computronics
-* Iron Chests (for now)
-
-
+Can be reworked later
